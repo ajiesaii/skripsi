@@ -1,0 +1,243 @@
+:root {
+  --primary-color: #428dff;
+  --secondary-color: #6c757d;
+  --success-color: #198754;
+  --info-color: #0dcaf0;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --dark-color: #212529;
+  --darker-color: #1a1e21;
+  --light-color: #f8f9fa;
+  --text-color: #e9ecef;
+  --text-muted: #adb5bd;
+}
+
+body.dark-mode {
+  background-color: var(--darker-color);
+  color: var(--text-color);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border: none;
+  transition: transform 0.3s ease;
+  background-color: var(--dark-color);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  border-radius: 10px 10px 0 0 !important;
+  padding: 15px 20px;
+  color: white;
+}
+
+.realtime-data {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.data-item {
+  background-color: var(--dark-color);
+  padding: 15px;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.data-item:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.power-item {
+  border-left: 4px solid var(--primary-color);
+}
+.voltage-item {
+  border-left: 4px solid var(--info-color);
+}
+.current-item {
+  border-left: 4px solid var(--success-color);
+}
+.frequency-item {
+  border-left: 4px solid var(--warning-color);
+}
+.pf-item {
+  border-left: 4px solid var(--danger-color);
+}
+.energy-item {
+  border-left: 4px solid #6f42c1;
+}
+
+.data-label {
+  display: block;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+
+.data-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-color);
+  transition: color 0.3s ease;
+}
+
+.data-unit {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-left: 5px;
+}
+
+.wave-animation {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(13, 110, 253, 0.3),
+    transparent
+  );
+  animation: wave 2s linear infinite;
+  opacity: 0.7;
+}
+
+@keyframes wave {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.timestamp {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* Floating Button */
+.floating-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+  position: relative;
+  margin: 10% auto;
+  padding: 0;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: modalopen 0.3s;
+}
+
+@keyframes modalopen {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  padding: 15px 20px;
+  border-radius: 10px 10px 0 0;
+  color: white;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.progress {
+  height: 25px;
+  border-radius: 12px;
+  background-color: var(--darker-color);
+}
+
+.progress-bar {
+  transition: width 0.5s ease;
+  font-weight: bold;
+}
+
+.budget-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Chart tooltips */
+.chartjs-tooltip {
+  background-color: var(--dark-color) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-color) !important;
+  border-radius: 6px !important;
+  padding: 10px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .realtime-data {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .realtime-data {
+    grid-template-columns: 1fr;
+  }
+
+  .data-value {
+    font-size: 20px;
+  }
+
+  .modal-content {
+    margin: 20% auto;
+    width: 95%;
+  }
+}

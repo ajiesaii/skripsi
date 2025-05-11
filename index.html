@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Energy Meter</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  </head>
+  <body class="dark-mode">
+    <div class="container">
+      <header class="text-center my-4">
+        <h1>Electricity Monitoring Dashboard</h1>
+        <p class="text-secondary">Real-time power consumption monitoring</p>
+      </header>
+
+      <div class="row">
+        <!-- Realtime Data Cards -->
+        <div class="col-md-12 mb-4">
+          <div class="card realtime-card bg-dark">
+            <div class="card-header bg-primary">
+              <h5 class="card-title mb-0">Current Power Status</h5>
+            </div>
+            <div class="card-body">
+              <div class="realtime-data">
+                <div class="data-item power-item">
+                  <span class="data-label">Power</span>
+                  <span class="data-value" id="power-value">0</span>
+                  <span class="data-unit">Watt</span>
+                </div>
+                <div class="data-item voltage-item">
+                  <span class="data-label">Voltage</span>
+                  <span class="data-value" id="voltage-value">0</span>
+                  <span class="data-unit">V</span>
+                </div>
+                <div class="data-item current-item">
+                  <span class="data-label">Current</span>
+                  <span class="data-value" id="current-value">0</span>
+                  <span class="data-unit">A</span>
+                </div>
+                <div class="data-item frequency-item">
+                  <span class="data-label">Frequency</span>
+                  <span class="data-value" id="frequency-value">0</span>
+                  <span class="data-unit">Hz</span>
+                </div>
+                <div class="data-item pf-item">
+                  <span class="data-label">Power Factor</span>
+                  <span class="data-value" id="pf-value">0</span>
+                </div>
+                <div class="data-item energy-item">
+                  <span class="data-label">Energy (Hourly)</span>
+                  <span class="data-value" id="energy-value">0</span>
+                  <span class="data-unit">kWh</span>
+                </div>
+              </div>
+              <div class="timestamp mt-3 text">
+                Last updated: <span id="timestamp"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Energy Consumption Chart -->
+        <div class="col-md-6 mb-4">
+          <div class="card bg-dark">
+            <div class="card-header bg-info">
+              <h5 class="card-title mb-0">24-Hour Energy Consumption (kWh)</h5>
+            </div>
+            <div class="card-body">
+              <canvas id="consumption-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison Chart -->
+        <div class="col-md-6 mb-4">
+          <div class="card bg-dark">
+            <div class="card-header bg-warning text-dark">
+              <h5 class="card-title mb-0">Actual vs Predicted (24 Hours)</h5>
+            </div>
+            <div class="card-body">
+              <canvas id="comparison-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Data Table Riwayat -->
+        <div class="col-md-12 mb-4">
+          <div class="card bg-dark">
+            <div class="card-header bg-secondary">
+              <h5 class="card-title mb-0">Daily Energy Log (Today)</h5>
+            </div>
+            <div class="card-body">
+              <table class="table table-dark table-bordered" id="log-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Energy (kWh)</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <button class="btn btn-sm btn-success" onclick="exportToCSV()">
+                Export to CSV
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Budget Button -->
+      <button id="budget-button" class="btn btn-primary floating-button">
+        <i class="fas fa-money-bill-wave"></i>
+      </button>
+
+      <!-- Budget Modal -->
+      <div id="budget-modal" class="modal">
+        <div class="modal-content bg-dark">
+          <div class="modal-header bg-success">
+            <h5 class="modal-title">Electricity Budget</h5>
+            <button id="close-modal" class="btn-close btn-close-white"></button>
+          </div>
+          <div class="modal-body">
+            <div class="budget-form">
+              <div class="mb-3">
+                <label for="monthly-budget" class="form-label"
+                  >Monthly Budget (IDR)</label
+                >
+                <input
+                  type="number"
+                  class="form-control bg-secondary text-light"
+                  id="monthly-budget"
+                  placeholder="Enter amount"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="electricity-rate" class="form-label"
+                  >Electricity Rate (IDR/kWh)</label
+                >
+                <input
+                  type="number"
+                  class="form-control bg-secondary text-light"
+                  id="electricity-rate"
+                  value="1444"
+                  placeholder="Enter rate per kWh"
+                />
+              </div>
+              <button id="save-budget" class="btn btn-primary">
+                Save Budget
+              </button>
+            </div>
+            <div class="budget-progress mt-4">
+              <div class="progress">
+                <div
+                  id="budget-progress-bar"
+                  class="progress-bar progress-bar-striped"
+                  role="progressbar"
+                  style="width: 0%"
+                >
+                  0%
+                </div>
+              </div>
+              <div class="budget-details mt-2">
+                <span id="budget-used">IDR 0</span> used of
+                <span id="budget-total">IDR 0</span>
+              </div>
+            </div>
+            <div id="budget-alert" class="alert alert-warning mt-3 d-none">
+              Warning: You've used 80% of your monthly budget!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="text-center my-4 text-secondary">
+        <p>Electricity Monitoring System &copy; 2023</p>
+      </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
