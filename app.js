@@ -410,36 +410,3 @@ function sendTelegramAlert() {
   console.log("Telegram alert would be sent:", message);
   // Actual implementation would use fetch() to call your Telegram bot endpoint
 }
-
-function updateLogTable() {
-  const tableBody = document.querySelector("#log-table tbody");
-  tableBody.innerHTML = "";
-
-  hourlyData.forEach((item) => {
-    const row = document.createElement("tr");
-    const status = item.value > 0.5 ? "⚠ High" : "Normal";
-    row.innerHTML = `
-      <td>${item.time}</td>
-      <td>${item.value.toFixed(5)}</td>
-      <td>${status}</td>
-    `;
-    tableBody.appendChild(row);
-  });
-}
-
-function exportToCSV() {
-  let csv = "Time,Energy (kWh),Status\n";
-  hourlyData.forEach((item) => {
-    const status = item.value > 0.5 ? "High" : "Normal";
-    csv += `${item.time},${item.value.toFixed(5)},${status}\n`;
-  });
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.setAttribute("hidden", "");
-  a.setAttribute("href", url);
-  a.setAttribute("download", "daily_energy_log.csv");
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
